@@ -1,0 +1,936 @@
+
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operasi K.O.D - Misi Selamatkan Akaun</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+:root {
+  --bg: #071426;
+  --panel: #10243e;
+  --panel2: #173653;
+  --line: #37617e;
+  --cyan: #46dcef;
+  --green: #49e2b1;
+  --text: #edf8ff;
+  --muted: #b3cde0;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Nunito', Arial, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 90% 5%, #1c4268, transparent 35%),
+    radial-gradient(circle at 0% 50%, #152b59, transparent 40%),
+    var(--bg);
+  min-height: 100vh;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(#49dbff15 1px, transparent 1px),
+    linear-gradient(90deg, #49dbff15 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+main {
+  position: relative;
+  max-width: 1150px;
+  margin: auto;
+  padding: 24px 18px 65px;
+}
+
+header {
+  background: linear-gradient(115deg, #102c50, #174c68);
+  border: 1px solid #378aa6;
+  border-radius: 25px;
+  padding: 32px;
+  margin-bottom: 22px;
+  box-shadow: 0 15px 35px #0005;
+}
+
+.brand {
+  color: var(--green);
+  font-size: 13px;
+  letter-spacing: 2px;
+  font-weight: 900;
+}
+
+h1 {
+  font-size: clamp(30px, 5vw, 52px);
+  margin: 10px 0;
+  line-height: 1.2;
+}
+
+h2 { margin-top: 0; }
+
+p { line-height: 1.8; }
+
+.subtitle { color: #c6e8f5; }
+
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.pill {
+  background: #103a4e;
+  color: #8af5df;
+  border: 1px solid #3a8995;
+  border-radius: 50px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.panel {
+  background: linear-gradient(145deg, #102740, #0d1c32);
+  border: 1px solid var(--line);
+  border-radius: 23px;
+  padding: 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 25px #0003;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.scenario {
+  background: linear-gradient(145deg, #173d5b, #10263e);
+  color: white;
+  border: 2px solid #346782;
+  border-radius: 18px;
+  padding: 22px;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: .2s;
+  min-height: 175px;
+}
+
+.scenario:hover {
+  transform: translateY(-5px);
+  border-color: var(--cyan);
+  box-shadow: 0 0 22px #32dfff45;
+}
+
+.scenario .emoji {
+  font-size: 35px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.scenario strong {
+  display: block;
+  font-size: 17px;
+}
+
+.scenario small {
+  color: var(--green);
+  font-weight: 800;
+}
+
+.story {
+  background: #152e4b;
+  border-left: 5px solid var(--cyan);
+  border-radius: 15px;
+  padding: 20px;
+  white-space: pre-line;
+  line-height: 1.9;
+}
+
+.slots, .bank {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.slot {
+  min-height: 165px;
+  border: 2px dashed #5085a5;
+  background: #0b1c32;
+  border-radius: 17px;
+  padding: 12px;
+  transition: .2s;
+}
+
+.slot.over {
+  background: #164b52;
+  border-color: var(--green);
+}
+
+.slot.correct {
+  border: 2px solid var(--green);
+  background: #123d34;
+}
+
+.slot.wrong {
+  border: 2px solid #ff718e;
+  background: #49283b;
+}
+
+.number {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--cyan);
+  margin-bottom: 12px;
+}
+
+.placeholder {
+  color: #83a5bb;
+  text-align: center;
+  padding: 30px 5px;
+  font-size: 14px;
+}
+
+.tile {
+  background: #1c4260;
+  color: white;
+  border: 1px solid #5790ac;
+  border-radius: 12px;
+  padding: 14px;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.6;
+  cursor: grab;
+  touch-action: manipulation;
+}
+
+.tile:hover {
+  border-color: var(--cyan);
+}
+
+.tile.selected {
+  outline: 3px solid #ffd46b;
+  background: #385344;
+}
+
+.bankplace {
+  background: #102a44;
+  border: 1px solid #345b79;
+  border-radius: 15px;
+  padding: 10px;
+  min-height: 110px;
+}
+
+button {
+  font-family: inherit;
+}
+
+.btn {
+  border: 0;
+  border-radius: 13px;
+  background: linear-gradient(110deg, #08a8bf, #176bc9);
+  color: white;
+  padding: 14px 22px;
+  font-weight: 900;
+  font-size: 15px;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.btn:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+.btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.secondary {
+  background: #294762;
+}
+
+.remove {
+  background: #294762;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+  padding: 7px;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.feedback {
+  background: #42283b;
+  border: 1px solid #e77c94;
+  padding: 20px;
+  border-radius: 15px;
+  margin-top: 20px;
+}
+
+.attempt {
+  display: inline-block;
+  background: #493c23;
+  border: 1px solid #aa8743;
+  color: #ffe4a2;
+  padding: 9px 15px;
+  border-radius: 40px;
+  font-weight: 900;
+  margin-bottom: 15px;
+}
+
+.lesson-step {
+  background: #183751;
+  border: 1px solid #427391;
+  border-radius: 15px;
+  padding: 17px;
+  margin: 12px 0;
+  line-height: 1.7;
+}
+
+.lesson-step strong {
+  color: var(--green);
+}
+
+.explanation {
+  background: #113d48;
+  border: 1px solid #37b9b1;
+  padding: 20px;
+  border-radius: 16px;
+  margin-top: 20px;
+}
+
+.hidden { display: none !important; }
+
+footer {
+  text-align: center;
+  color: #90b4ca;
+  font-size: 12px;
+  margin-top: 35px;
+}
+
+@media (max-width: 750px) {
+  .grid, .slots, .bank {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  header, .panel { padding: 18px; }
+}
+
+@media (max-width: 430px) {
+  .grid { grid-template-columns: 1fr; }
+  .slots, .bank { gap: 8px; }
+  .slot { padding: 8px; }
+  .tile { font-size: 12px; padding: 10px; }
+}
+</style>
+</head>
+
+<body>
+<main>
+
+<header>
+  <div class="brand">🛡️ OPERASI K.O.D | CABARAN 3</div>
+  <h1>🔐 Misi Selamatkan Akaun</h1>
+  <p class="subtitle">
+    Selamat datang, Ejen Siber!
+    Selesaikan masalah keselamatan digital dengan
+    menyusun langkah perlindungan yang betul.
+  </p>
+  <div class="status">
+    <span class="pill">🟢 SISTEM AKTIF</span>
+    <span class="pill">6 SITUASI</span>
+    <span class="pill">6 LANGKAH</span>
+    <span class="pill">2 PERCUBAAN</span>
+  </div>
+</header>
+
+<section id="home">
+  <div class="panel">
+    <h2>🎮 Pilih Misi Anda</h2>
+    <p>
+      Pilih satu daripada enam situasi di bawah.
+      Baca masalah yang dihadapi oleh watak dan
+      bantu mereka melindungi akaun digital.
+    </p>
+    <div id="scenarios" class="grid"></div>
+  </div>
+</section>
+
+<section id="game" class="hidden">
+
+  <div class="panel">
+    <span id="attempt" class="attempt"></span>
+    <h2 id="gameTitle"></h2>
+    <div id="story" class="story"></div>
+  </div>
+
+  <div class="panel">
+    <h2>🎯 Susun Langkah Penyelesaian</h2>
+    <p>
+      Seret enam kad tindakan ke dalam kotak
+      bernombor 1 hingga 6 mengikut urutan yang betul.
+    </p>
+    <p>
+      Anda juga boleh tekan kad, kemudian tekan
+      kotak bernombor untuk meletakkannya.
+    </p>
+    <div id="slots" class="slots"></div>
+  </div>
+
+  <div class="panel">
+    <h2>🧩 Pilihan Langkah</h2>
+    <p>Pilih dan susun semua kad tindakan di atas.</p>
+    <div id="bank" class="bank"></div>
+
+    <div style="margin-top:22px">
+      <button id="checkBtn" class="btn"
+        onclick="checkAnswer()">
+        ✅ Semak Jawapan
+      </button>
+
+      <button class="btn secondary"
+        onclick="resetGame()">
+        🔄 Susun Semula
+      </button>
+
+      <button class="btn secondary"
+        onclick="goHome()">
+        🏠 Pilih Situasi
+      </button>
+    </div>
+
+    <div id="feedback"></div>
+  </div>
+</section>
+
+<section id="lesson" class="hidden">
+  <div class="panel">
+    <h1 id="lessonTitle"></h1>
+    <p id="lessonIntro"></p>
+
+    <h2>📋 Susunan Langkah yang Betul</h2>
+    <div id="lessonSteps"></div>
+
+    <div class="explanation">
+      <h2>💡 Mengapa Langkah Ini Penting?</h2>
+      <p id="lessonWhy"></p>
+    </div>
+
+    <div style="margin-top:25px">
+      <button class="btn" onclick="goHome()">
+        🏠 Kembali ke Pilihan Situasi
+      </button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  OPERASI K.O.D • CABARAN 3 • MISI SELAMATKAN AKAUN
+</footer>
+
+</main>
+
+<script>
+// =====================================
+// DATA ENAM SITUASI
+// =====================================
+
+const data = [
+{
+  icon: "🎮",
+  title: "Akaun Permainan Ali Digodam",
+  story: `Ali sedang bermain permainan dalam talian bersama rakan-rakannya. Tiba-tiba, Ali dikeluarkan daripada akaunnya tanpa sebarang sebab.
+
+Apabila Ali cuba log masuk semula, sistem memberitahu bahawa kata laluannya telah ditukar.
+
+Ali juga menerima pemberitahuan bahawa terdapat log masuk daripada peranti yang tidak dikenalinya.
+
+Ali mula panik kerana akaun tersebut mengandungi banyak pencapaian dan barangan permainan yang telah dikumpulkannya.
+
+MISI ANDA:
+Bantu Ali menyusun enam langkah yang sesuai untuk mendapatkan semula akaunnya dan melindunginya daripada penggodam!`,
+  steps: [
+    "Kenal pasti bahawa akaun mungkin telah diambil alih apabila kata laluan berubah tanpa kebenaran.",
+    "Buka aplikasi atau laman rasmi permainan tanpa menggunakan pautan mencurigakan.",
+    "Gunakan fungsi pemulihan akaun atau hubungi sokongan rasmi untuk mendapatkan semula akses.",
+    "Selepas akses dipulihkan, tukar kata laluan kepada kata laluan baharu yang kuat dan unik.",
+    "Semak peranti atau sesi log masuk dan keluarkan peranti yang tidak dikenali.",
+    "Aktifkan pengesahan dua faktor (2FA) dan maklumkan kepada orang dewasa yang dipercayai."
+  ],
+  why: "Apabila akaun diambil alih, pengguna perlu menggunakan saluran pemulihan rasmi. Selepas mendapat semula akses, kata laluan, sesi log masuk dan tetapan keselamatan perlu diperiksa."
+},
+{
+  icon: "📱",
+  title: "Kod OTP Misteri Sara",
+  story: `Sara sedang menonton video di rumah apabila dia menerima mesej yang mengandungi kod OTP daripada sebuah aplikasi.
+
+Tidak lama kemudian, seseorang menelefonnya dan mengaku sebagai pegawai khidmat pelanggan.
+
+Individu itu mengatakan bahawa akaun Sara akan disekat jika dia tidak memberikan kod OTP dengan segera.
+
+Sara berasa takut kerana dia tidak mahu kehilangan akaunnya. Namun, dia berasa pelik kerana dia tidak pernah meminta kod tersebut.
+
+MISI ANDA:
+Bantu Sara menyusun enam tindakan keselamatan supaya dia tidak tertipu dan akaunnya kekal selamat!`,
+  steps: [
+    "Kenal pasti bahawa Sara menerima OTP walaupun tidak meminta kod tersebut.",
+    "Jangan berikan kod OTP kepada pemanggil atau sesiapa sahaja.",
+    "Tamatkan panggilan apabila individu itu mendesak Sara berkongsi kod.",
+    "Buka aplikasi rasmi secara terus untuk menyemak keadaan akaun.",
+    "Semak aktiviti log masuk dan tukar kata laluan jika terdapat tanda pencerobohan.",
+    "Laporkan panggilan mencurigakan dan dapatkan bantuan orang dewasa yang dipercayai."
+  ],
+  why: "Kod OTP merupakan maklumat keselamatan rahsia. Penipu boleh menggunakan kod itu untuk cuba mengakses akaun. Jangan berkongsi OTP walaupun seseorang mengaku sebagai pegawai rasmi."
+},
+{
+  icon: "🎁",
+  title: "Hadiah Percuma untuk Danish",
+  story: `Danish gemar bermain permainan dalam talian selepas menyiapkan kerja sekolahnya.
+
+Pada suatu petang, dia menerima mesej daripada pemain yang tidak dikenalinya.
+
+Pemain tersebut mengatakan bahawa Danish telah memenangi 5,000 syiling permainan secara percuma.
+
+Untuk mendapatkan hadiah itu, Danish diminta menekan satu pautan dan memasukkan nama pengguna, kata laluan serta kod pengesahan akaunnya.
+
+Danish sangat teruja, tetapi tidak pasti sama ada tawaran tersebut benar.
+
+MISI ANDA:
+Bantu Danish menyusun enam langkah untuk mengenal pasti penipuan dan memastikan akaun permainannya tidak dicuri!`,
+  steps: [
+    "Kenal pasti bahawa tawaran hadiah luar biasa daripada orang tidak dikenali mungkin satu penipuan.",
+    "Jangan tekan pautan hadiah yang dihantar melalui mesej tersebut.",
+    "Jangan berikan kata laluan atau kod OTP kepada penghantar.",
+    "Semak promosi melalui aplikasi atau laman rasmi permainan.",
+    "Sekat dan laporkan akaun yang menghantar mesej mencurigakan.",
+    "Jika maklumat sudah terdedah, tukar kata laluan melalui saluran rasmi dan minta bantuan orang dewasa."
+  ],
+  why: "Penipu sering menggunakan hadiah palsu untuk mendapatkan maklumat akaun. Tawaran yang terlalu menarik perlu disemak melalui sumber rasmi."
+},
+{
+  icon: "💬",
+  title: "Akaun WhatsApp Aina Dalam Bahaya",
+  story: `Aina sedang menyiapkan kerja sekolah apabila dia menerima mesej WhatsApp daripada nombor yang tidak dikenali.
+
+Individu tersebut memberitahu bahawa dia tersilap menghantar kod pengesahan enam digit ke nombor telefon Aina.
+
+Dia meminta Aina menghantar semula kod tersebut dengan segera.
+
+Beberapa saat kemudian, Aina menerima kod pendaftaran WhatsApp walaupun dia tidak cuba mendaftar atau log masuk ke akaunnya.
+
+Individu itu terus mendesak Aina memberikan kod tersebut.
+
+MISI ANDA:
+Bantu Aina menyusun enam tindakan untuk mengelakkan akaun WhatsAppnya daripada diambil alih oleh penipu!`,
+  steps: [
+    "Kenal pasti bahawa kod pendaftaran WhatsApp diterima tanpa permintaan Aina.",
+    "Jangan kongsi kod enam digit tersebut dengan sesiapa.",
+    "Jangan balas desakan individu itu dan hentikan perbualan.",
+    "Semak bahagian Peranti Terpaut dan keluarkan peranti yang tidak dikenali.",
+    "Aktifkan pengesahan dua langkah WhatsApp menggunakan PIN yang sukar diteka.",
+    "Sekat dan laporkan nombor mencurigakan serta maklumkan kepada orang dewasa yang dipercayai."
+  ],
+  why: "Kod pendaftaran WhatsApp boleh disalahgunakan untuk mengambil alih akaun. Kod tersebut tidak boleh dikongsi walaupun seseorang mendakwa ia tersalah hantar."
+},
+{
+  icon: "🎣",
+  title: "Pautan Mencurigakan Hakim",
+  story: `Hakim menerima mesej yang mengatakan akaun pembelajarannya akan disekat dalam masa 30 minit kerana terdapat masalah keselamatan.
+
+Mesej tersebut menyediakan pautan untuk mengesahkan identiti dan meminta alamat e-mel, kata laluan serta maklumat peribadinya.
+
+Hakim bimbang tidak dapat mengakses bahan pembelajaran dan menyiapkan tugasan sekolah.
+
+Namun, dia menyedari alamat penghantar kelihatan pelik dan mesej itu mempunyai beberapa kesalahan ejaan.
+
+MISI ANDA:
+Bantu Hakim menyusun enam langkah keselamatan untuk mengenal pasti mesej palsu dan mengelakkan maklumat peribadinya daripada dicuri!`,
+  steps: [
+    "Perhatikan tanda amaran seperti desakan masa, alamat penghantar pelik dan kesalahan ejaan.",
+    "Jangan tekan pautan yang terdapat dalam mesej tersebut.",
+    "Jangan masukkan kata laluan atau maklumat peribadi pada laman yang tidak disahkan.",
+    "Buka portal pembelajaran rasmi menggunakan alamat yang biasa digunakan.",
+    "Semak status akaun dengan guru atau pentadbir melalui saluran rasmi.",
+    "Laporkan mesej mencurigakan dan padamkannya selepas menyimpan bukti yang diperlukan."
+  ],
+  why: "Mesej pancingan data sering menggunakan ancaman dan desakan masa untuk memperdaya pengguna. Pengesahan perlu dilakukan melalui saluran rasmi."
+},
+{
+  icon: "🔐",
+  title: "Permintaan Pengesahan 2FA Farah",
+  story: `Farah baru sahaja mengaktifkan pengesahan dua faktor (2FA) pada akaun media sosialnya.
+
+Pada suatu malam, Farah menerima pemberitahuan yang meminta dia meluluskan percubaan log masuk daripada peranti yang tidak dikenalinya.
+
+Farah berasa hairan kerana dia tidak sedang cuba log masuk ke akaun tersebut.
+
+Beberapa minit kemudian, pemberitahuan yang sama muncul berulang kali.
+
+Farah mula risau apabila menyedari bahawa seseorang mungkin mengetahui kata laluannya.
+
+MISI ANDA:
+Bantu Farah menyusun enam langkah untuk menolak cubaan log masuk mencurigakan dan memastikan akaunnya terus dilindungi!`,
+  steps: [
+    "Kenal pasti bahawa permintaan pengesahan 2FA itu bukan daripada Farah.",
+    "Tolak permintaan log masuk dan jangan tekan butang luluskan.",
+    "Jangan kongsi sebarang kod pengesahan dengan orang lain.",
+    "Buka aplikasi rasmi untuk menyemak aktiviti keselamatan akaun.",
+    "Tukar kata laluan kepada kata laluan baharu yang kuat dan unik.",
+    "Log keluar sesi tidak dikenali, semak tetapan 2FA dan laporkan cubaan pencerobohan jika perlu."
+  ],
+  why: "Permintaan 2FA yang tidak dimulakan sendiri mungkin menunjukkan cubaan log masuk oleh orang lain. Jangan meluluskan permintaan tersebut walaupun ia muncul berulang kali."
+}
+];
+
+// =====================================
+// PEMBOLEH UBAH PERMAINAN
+// =====================================
+
+let current = -1;
+let order = Array(6).fill(null);
+let bankOrder = [];
+let selected = null;
+let attempts = 0;
+let checked = false;
+let locked = false;
+
+const $ = id => document.getElementById(id);
+
+// =====================================
+// FUNGSI RAWAK
+// =====================================
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// =====================================
+// HALAMAN PILIHAN SITUASI
+// =====================================
+
+function buildHome() {
+  $("scenarios").innerHTML = data.map((d, i) => `
+    <button class="scenario" onclick="start(${i})">
+      <span class="emoji">${d.icon}</span>
+      <strong>Situasi ${i + 1}: ${d.title}</strong>
+      <br>
+      <small>Mulakan Misi →</small>
+    </button>
+  `).join("");
+}
+
+// =====================================
+// MULAKAN MISI
+// =====================================
+
+function start(i) {
+  current = i;
+  locked = false;
+
+  $("home").classList.add("hidden");
+  $("lesson").classList.add("hidden");
+  $("game").classList.remove("hidden");
+
+  $("gameTitle").textContent =
+    `${data[i].icon} Situasi ${i + 1}: ${data[i].title}`;
+
+  $("story").textContent = data[i].story;
+
+  resetGame();
+  window.scrollTo(0, 0);
+}
+
+// =====================================
+// KEMBALI KE HALAMAN UTAMA
+// =====================================
+
+function goHome() {
+  current = -1;
+  locked = false;
+  selected = null;
+
+  $("game").classList.add("hidden");
+  $("lesson").classList.add("hidden");
+  $("home").classList.remove("hidden");
+
+  window.scrollTo(0, 0);
+}
+
+// =====================================
+// SET SEMULA PERMAINAN
+// =====================================
+
+function resetGame() {
+  if (locked) return;
+
+  attempts = 0;
+  selected = null;
+  checked = false;
+
+  order = Array(6).fill(null);
+  bankOrder = shuffle([0, 1, 2, 3, 4, 5]);
+
+  $("feedback").innerHTML = "";
+
+  updateAttempt();
+  render();
+}
+
+function updateAttempt() {
+  $("attempt").textContent =
+    `Percubaan ${Math.min(attempts + 1, 2)} daripada 2`;
+}
+
+// =====================================
+// PAPAR KAD TINDAKAN
+// =====================================
+
+function tile(id) {
+  return `
+    <div
+      class="tile ${selected === id ? "selected" : ""}"
+      draggable="true"
+      ondragstart="drag(event, ${id})"
+      onclick="choose(${id})">
+      ${data[current].steps[id]}
+    </div>
+  `;
+}
+
+// =====================================
+// PAPAR KOTAK DAN KAD
+// =====================================
+
+function render() {
+  $("slots").innerHTML = order.map((id, pos) => `
+    <div
+      class="slot ${checked ? (id === pos ? "correct" : "wrong") : ""}"
+      onclick="place(${pos})"
+      ondragover="allow(event)"
+      ondragenter="event.currentTarget.classList.add('over')"
+      ondragleave="event.currentTarget.classList.remove('over')"
+      ondrop="drop(event, ${pos})">
+
+      <div class="number">LANGKAH ${pos + 1}</div>
+
+      ${id === null
+        ? '<div class="placeholder">Letakkan langkah di sini</div>'
+        : tile(id) + `
+          <button class="remove"
+            onclick="event.stopPropagation(); removeTile(${pos})">
+            Keluarkan ↩
+          </button>`
+      }
+    </div>
+  `).join("");
+
+  const available = bankOrder.filter(id => !order.includes(id));
+
+  $("bank").innerHTML = available.length
+    ? available.map(id => `
+        <div class="bankplace">${tile(id)}</div>
+      `).join("")
+    : '<p>Semua kad telah disusun!</p>';
+
+  $("checkBtn").disabled = order.some(id => id === null);
+}
+
+// =====================================
+// PILIH KAD
+// =====================================
+
+function choose(id) {
+  if (locked) return;
+
+  selected = selected === id ? null : id;
+  render();
+}
+
+// =====================================
+// LETAK KAD DALAM KOTAK
+// =====================================
+
+function place(pos) {
+  if (selected === null) return;
+  move(selected, pos);
+}
+
+function move(id, pos) {
+  if (locked) return;
+
+  const old = order.indexOf(id);
+  const target = order[pos];
+
+  if (old !== -1) {
+    order[old] = target;
+  }
+
+  order[pos] = id;
+
+  selected = null;
+  checked = false;
+
+  $("feedback").innerHTML = "";
+  render();
+}
+
+function removeTile(pos) {
+  if (locked) return;
+
+  order[pos] = null;
+  checked = false;
+
+  $("feedback").innerHTML = "";
+  render();
+}
+
+// =====================================
+// DRAG AND DROP
+// =====================================
+
+function drag(event, id) {
+  event.dataTransfer.setData("text/plain", String(id));
+  event.dataTransfer.effectAllowed = "move";
+}
+
+function allow(event) {
+  event.preventDefault();
+}
+
+function drop(event, pos) {
+  event.preventDefault();
+
+  const id = Number(event.dataTransfer.getData("text/plain"));
+
+  if (Number.isInteger(id) && id >= 0 && id < 6) {
+    move(id, pos);
+  }
+}
+
+// =====================================
+// SEMAK JAWAPAN
+// MAKSIMUM DUA PERCUBAAN
+// =====================================
+
+function checkAnswer() {
+  if (locked || order.some(id => id === null)) return;
+
+  attempts++;
+
+  const correct = order.every((id, pos) => id === pos);
+
+  // Jika semua jawapan betul
+  if (correct) {
+    showLesson(true);
+    return;
+  }
+
+  // Jika salah pada percubaan kedua
+  if (attempts >= 2) {
+    showLesson(false);
+    return;
+  }
+
+  // Jika salah pada percubaan pertama
+  checked = true;
+  updateAttempt();
+  render();
+
+  $("feedback").innerHTML = `
+    <div class="feedback">
+      <h2>❌ Belum Tepat!</h2>
+      <p>
+        Susunan langkah anda masih mempunyai kesilapan.
+        Anda mempunyai satu peluang lagi!
+      </p>
+      <p>
+        Semak semula langkah yang ditandakan merah.
+        Fikirkan tindakan yang perlu dilakukan dahulu
+        sebelum menyusun semula jawapan.
+      </p>
+      <button class="btn secondary"
+        onclick="tryAgain()">
+        🔄 Cuba Kali Kedua
+      </button>
+    </div>
+  `;
+
+  $("feedback").scrollIntoView({
+    behavior: "smooth",
+    block: "nearest"
+  });
+}
+
+// =====================================
+// CUBA KALI KEDUA
+// =====================================
+
+function tryAgain() {
+  checked = false;
+  $("feedback").innerHTML = "";
+  render();
+}
+
+// =====================================
+// HALAMAN PENERANGAN
+// =====================================
+
+function showLesson(success) {
+  locked = true;
+
+  $("game").classList.add("hidden");
+  $("lesson").classList.remove("hidden");
+
+  if (success) {
+    $("lessonTitle").textContent =
+      "🎉 Tahniah! Misi Berjaya!";
+
+    $("lessonIntro").textContent =
+      `Hebat, Ejen Siber! Anda berjaya menyusun keenam-enam langkah dengan betul dalam ${attempts} percubaan. Mari fahami mengapa setiap tindakan penting.`;
+  } else {
+    $("lessonTitle").textContent =
+      "📖 Jom Belajar daripada Kesilapan!";
+
+    $("lessonIntro").textContent =
+      "Anda telah menggunakan kedua-dua percubaan. Jangan risau! Mari pelajari susunan langkah yang disarankan untuk menyelesaikan situasi ini.";
+  }
+
+  $("lessonSteps").innerHTML =
+    data[current].steps.map((step, i) => `
+      <div class="lesson-step">
+        <strong>Langkah ${i + 1}</strong>
+        <p>${step}</p>
+      </div>
+    `).join("");
+
+  $("lessonWhy").textContent = data[current].why;
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+// =====================================
+// JALANKAN PERMAINAN
+// =====================================
+
+buildHome();
+
+</script>
+</body>
+</html>
